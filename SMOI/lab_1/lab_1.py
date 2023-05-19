@@ -7,57 +7,107 @@ import copy
 variant = 17
 np.random.seed(variant)
 item_size = 100
-x = list (range(1,101))
 
+
+class Plot:
+    def __init__(self):
+        self.x = list (range(1,101))
+        self.y = (np.zeros(item_size))
+        self.otkl = variant/100
+        self.pocket_count = 12
+        self.min: int
+        self.max: int
+        self.pocket: float
+        self.pocket_list: float
+        self.pocket_value: int
+        self.otn_chast: float
+        self.norm_rasp: float
+        self.nr: float
+        self.f_y: float
+        self.teor = 0 
+        self.m = 0
+
+    def count_pocket(self):
+        self.pocket_value = np.zeros((self.pocket_count+1),dtype=int)
+        for i in range (0, item_size):
+            for j in range (0, self.pocket_value.size):
+                if self.y[i] <= self.pocket_list[j]:
+                    self.pocket_value[j]+=1
+                    break
+
+    def form_f_y(self):
+        self.f_y = copy.copy(self.otn_chast)
+        for i in range (1, self.f_y.size):
+            self.f_y[i]=self.f_y[i-1]+self.f_y[i]
+    
 #   Лист 1. Нормальное распределение
-otkl = variant/100
-normal = np.random.normal(variant, otkl, item_size)
+if __name__ == "__main__":
+    p1 = Plot()
+    p1.y = np.random.normal(variant, p1.otkl, item_size)
+    p1.pocket_count = 12
+    p1.min = p1.y.min()
+    p1.max = p1.y.max()
+    p1.pocket = (p1.max-p1.min)/p1.pocket_count
+    p1.pocket_list = np.zeros(p1.pocket_count+1)
+    p1.pocket_list[0] = p1.min
+    for i in range (1, p1.pocket_count+1):
+            p1.pocket_list[i] = p1.pocket_list[i-1] + p1.pocket
+    """
+    for i in range (1, p1.pocket_count+1):
+        p1.pocket_list[i] = p1.pocket_list[i-1] + p1.pocket
+    p1.pocket_value = np.zeros(p1.pocket_count+1)
+    for i in range (0, item_size):
+        for j in range (0, p1.pocket_value.size):
+            if p1.y[i] <= p1.pocket_list[j]:
+                p1.pocket_value[j]+=1
+                break
+    """
+    p1.count_pocket()
+    p1.otn_chast = copy.copy(p1.pocket_value)/item_size
 
+    p1.norm_rasp = np.arange(float(p1.pocket_count+1))*0
+    for i in range (0, p1.norm_rasp.size):
+        p1.norm_rasp[i] = norm.pdf(p1.pocket_list[i], variant, p1.otkl)
+    p1.nr = copy.copy(p1.norm_rasp)/sum(p1.norm_rasp)
+    """
+    p1.f_y = copy.copy(p1.otn_chast)
+    for i in range (1, p1.f_y.size):
+        p1.f_y[i]=p1.f_y[i-1]+p1.f_y[i]
+    """
+    p1.form_f_y()
+        
+    #   Лист 2. Равномерное распределение
+    p2 = Plot()
+    p2.y = np.random.uniform(variant, variant*2, item_size)
+    p2.pocket = 1
+    p2.pocket_count = variant
+    p2.min = variant+1
+    p2.max = variant*2
+    p2.pocket_list = list (range(p2.min, p2.max+1))
+    p2.count_pocket()
+    p2.pocket_value = p2.pocket_value[:17]
+    p2.otn_chast = copy.copy(p2.pocket_value)/item_size
+    p2.teor = (copy.copy(p2.pocket_value)*0+1/variant)
+    p2.form_f_y()
+    print(p2.pocket_value)
+    
+    #   Отрисовка
 
-pocket_count = 12
-min = normal.min()
-max = normal.max()
-pocket = (max-min)/pocket_count
+    figure, axis = plt.subplots(2, 4)
+    axis[0, 0].plot(p1.x, p1.y)
+    axis[0, 0].set_title('Title 1')
+    axis[0, 1].hist(p1.y, edgecolor = 'black', bins=12)
+    axis[0, 2].hist(p1.y,  weights=np.ones_like (p1.y) / len (p1.y), edgecolor = 'black', bins=12)
+    axis[0, 2].plot(p1.pocket_list, p1.nr)
+    axis[0, 3].plot(p1.pocket_list, p1.f_y)
+    axis[1, 0].plot(p1.x, p1.y)
+    axis[1, 0].set_title('Title 1')
+    axis[1, 1].hist(p2.y, edgecolor = 'black', bins=12)
+    axis[1, 2].hist(p2.y,  weights=np.ones_like (p2.y) / len (p2.y), edgecolor = 'black', bins=variant)
+    axis[1, 2].plot(p2.pocket_list, p2.teor)
+    axis[1, 3].plot(p2.pocket_list, p2.f_y)
+    
 
-pocket_list = np.arange(float(pocket_count+1))
-pocket_list[0] = min
-for i in range (1, 13):
-    pocket_list[i] = pocket_list[i-1] + pocket
-pocket_value = np.arange(pocket_count+1)*0
-for i in range (0, item_size):
-    for j in range (0, pocket_value.size):
-        if normal[i] <= pocket_list[j]:
-            pocket_value[j]+=1
-            break
+    plt.tight_layout()
+    plt.show()
 
-#otn_chast = np.arange(float(pocket_count+1)*0)
-otn_chast = copy.copy(pocket_value)/item_size
-
-norm_rasp = np.arange(float(pocket_count+1))*0
-for i in range (0, norm_rasp.size):
-    norm_rasp[i] = norm.pdf(pocket_list[i], variant, otkl)
-
-nr = copy.copy(norm_rasp)/sum(norm_rasp)
-
-f_y = copy.copy(otn_chast)
-for i in range (1, f_y.size):
-    f_y[i]=f_y[i-1]+f_y[i]
-
-#   Лист 2. Равномерное распределение
-
-ravn = np.random.uniform(variant, variant*2, item_size)
-
-
-#   Отрисовка
-
-figure, axis = plt.subplots(2, 4)
-axis[0, 0].plot(x, normal)
-axis[0, 0].set_title('Title 1')
-axis[0, 1].hist(normal, edgecolor = 'black', bins=12)
-axis[0, 2].hist(normal,  weights=np.ones_like (normal) / len (normal), edgecolor = 'black', bins=12)
-axis[0, 2].plot(pocket_list, nr)
-axis[0, 3].plot(pocket_list, f_y)
-
-plt.tight_layout()
-plt.show()
-print(nr)
