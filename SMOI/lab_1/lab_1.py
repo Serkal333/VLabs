@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from scipy.stats import norm
+from scipy.stats import norm, binom
 import numpy as np
 import copy
 
@@ -98,7 +98,27 @@ if __name__ == "__main__":
 
     #   Лист 4. Бинауральное
 
-    print(p3.otn_chast)
+    p4 = Plot()
+    p4.m = 5
+    p4.y = p4.y[:item_size]
+    for i in range (0, item_size):
+        p4.y = np.random.binomial(p4.m, 0.17, item_size)
+    p4.pocket = 1
+    p4.pocket_count = p4.m
+    p4.min = 0
+    p4.max = p4.m
+    p4.pocket_list = list(range(p4.min, p4.max+1))
+    p4.count_pocket()
+    p4.otn_chast = copy.copy(p4.pocket_value)/item_size
+
+    p4.teor = np.arange(float(p4.pocket_count+1))*0
+    for i in range (0, p4.m):
+        p4.teor[i] = binom.pmf(p4.pocket_list[i], p4.m, p4.otkl)
+    p4.form_f_y()
+
+    print(p4.f_y)
+    print(sum(p4.teor))
+    print(p4.pocket_value)
     
     #   Отрисовка
 
@@ -116,7 +136,7 @@ if __name__ == "__main__":
     axis[1, 2].plot(p2.pocket_list, p2.teor)
     axis[1, 3].plot(p2.pocket_list, p2.f_y)
     
-    plt.gcf()
+    
 
     plt.tight_layout()
     plt.show()
