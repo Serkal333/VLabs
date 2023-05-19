@@ -52,16 +52,7 @@ if __name__ == "__main__":
     p1.pocket_list[0] = p1.min
     for i in range (1, p1.pocket_count+1):
             p1.pocket_list[i] = p1.pocket_list[i-1] + p1.pocket
-    """
-    for i in range (1, p1.pocket_count+1):
-        p1.pocket_list[i] = p1.pocket_list[i-1] + p1.pocket
-    p1.pocket_value = np.zeros(p1.pocket_count+1)
-    for i in range (0, item_size):
-        for j in range (0, p1.pocket_value.size):
-            if p1.y[i] <= p1.pocket_list[j]:
-                p1.pocket_value[j]+=1
-                break
-    """
+
     p1.count_pocket()
     p1.otn_chast = copy.copy(p1.pocket_value)/item_size
 
@@ -69,11 +60,7 @@ if __name__ == "__main__":
     for i in range (0, p1.norm_rasp.size):
         p1.norm_rasp[i] = norm.pdf(p1.pocket_list[i], variant, p1.otkl)
     p1.nr = copy.copy(p1.norm_rasp)/sum(p1.norm_rasp)
-    """
-    p1.f_y = copy.copy(p1.otn_chast)
-    for i in range (1, p1.f_y.size):
-        p1.f_y[i]=p1.f_y[i-1]+p1.f_y[i]
-    """
+
     p1.form_f_y()
         
     #   Лист 2. Равномерное распределение
@@ -85,11 +72,33 @@ if __name__ == "__main__":
     p2.max = variant*2
     p2.pocket_list = list (range(p2.min, p2.max+1))
     p2.count_pocket()
-    p2.pocket_value = p2.pocket_value[:17]
+    p2.pocket_value = p2.pocket_value[:variant]
     p2.otn_chast = copy.copy(p2.pocket_value)/item_size
     p2.teor = (copy.copy(p2.pocket_value)*0+1/variant)
     p2.form_f_y()
-    print(p2.pocket_value)
+
+    #   Лист 3. Бернулли
+
+    p3 = Plot()
+    p3.y = p3.y[:item_size]
+    for i in range (0, item_size):
+        p3.y = np.random.binomial(1, 0.17, item_size)
+    p3.pocket_list = [0, 1]
+    p3.pocket_value = np.zeros((2),dtype=int)
+    p3.pocket_count = 2
+    for i in range (0, item_size):
+        if p3.y[i] == 0:
+            p3.pocket_value[0]+=1
+        else:
+            p3.pocket_value[1]+=1
+    p3.otn_chast = copy.copy(p3.pocket_value)/item_size
+    p3.teor = [1-p3.otkl, p3.otkl]
+    p3.f_y = copy.copy(p3.otn_chast)
+    p3.f_y[1] = p3.f_y[1]+p3.f_y[0]
+
+    #   Лист 4. Бинауральное
+
+    print(p3.otn_chast)
     
     #   Отрисовка
 
@@ -107,6 +116,7 @@ if __name__ == "__main__":
     axis[1, 2].plot(p2.pocket_list, p2.teor)
     axis[1, 3].plot(p2.pocket_list, p2.f_y)
     
+    plt.gcf()
 
     plt.tight_layout()
     plt.show()
