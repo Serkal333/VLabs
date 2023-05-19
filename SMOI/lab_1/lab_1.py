@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from scipy.stats import norm, binom
+from scipy.stats import norm, binom, poisson
 import numpy as np
 import copy
 
@@ -115,11 +115,31 @@ if __name__ == "__main__":
     for i in range (0, p4.m):
         p4.teor[i] = binom.pmf(p4.pocket_list[i], p4.m, p4.otkl)
     p4.form_f_y()
-
-    print(p4.f_y)
-    print(sum(p4.teor))
-    print(p4.pocket_value)
+#
+    #print(p4.f_y)
+    #print(sum(p4.teor))
+    #print(p4.pocket_value)
     
+    #   Лист 5. Пуассона
+
+    p5 = Plot()
+    p5.y = np.random.poisson(variant, item_size)
+    p5.min = 0
+    p5.max = max(p5.y)
+    p5.pocket = 1
+    p5.pocket_count = p5.max
+    p5.pocket_list = list(range(p5.min, p5.max+1))
+    p5.count_pocket()
+    p5.otn_chast = copy.copy(p5.pocket_value)/item_size
+    p5.teor = np.arange(float(p5.pocket_count+1))*0
+    for i in range (0, p5.pocket_count):
+        p5.teor[i] = poisson.pmf(p5.pocket_list[i], p5.otkl)
+    p5.form_f_y()
+
+    
+    print(p5.f_y)
+    
+
     #   Отрисовка
 
     figure, axis = plt.subplots(2, 4)
