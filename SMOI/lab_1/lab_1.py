@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.widgets import Button
 from scipy.stats import norm, binom, poisson
 import numpy as np
 import copy
@@ -115,11 +116,7 @@ if __name__ == "__main__":
     for i in range (0, p4.m):
         p4.teor[i] = binom.pmf(p4.pocket_list[i], p4.m, p4.otkl)
     p4.form_f_y()
-#
-    #print(p4.f_y)
-    #print(sum(p4.teor))
-    #print(p4.pocket_value)
-    
+
     #   Лист 5. Пуассона
 
     p5 = Plot()
@@ -133,30 +130,84 @@ if __name__ == "__main__":
     p5.otn_chast = copy.copy(p5.pocket_value)/item_size
     p5.teor = np.arange(float(p5.pocket_count+1))*0
     for i in range (0, p5.pocket_count):
-        p5.teor[i] = poisson.pmf(p5.pocket_list[i], p5.otkl)
+        p5.teor[i] = poisson.pmf(p5.pocket_list[i], sum(p5.y)/item_size) #!!!!!!!!!!ХЗ насколько это правильно
     p5.form_f_y()
 
+    # Лист 6. сглаживание
+
     
-    print(p5.f_y)
+    print(p5.teor)
     
 
     #   Отрисовка
 
-    figure, axis = plt.subplots(2, 4)
-    axis[0, 0].plot(p1.x, p1.y)
-    axis[0, 0].set_title('Title 1')
-    axis[0, 1].hist(p1.y, edgecolor = 'black', bins=12)
-    axis[0, 2].hist(p1.y,  weights=np.ones_like (p1.y) / len (p1.y), edgecolor = 'black', bins=12)
-    axis[0, 2].plot(p1.pocket_list, p1.nr)
-    axis[0, 3].plot(p1.pocket_list, p1.f_y)
-    axis[1, 0].plot(p1.x, p1.y)
-    axis[1, 0].set_title('Title 1')
-    axis[1, 1].hist(p2.y, edgecolor = 'black', bins=12)
-    axis[1, 2].hist(p2.y,  weights=np.ones_like (p2.y) / len (p2.y), edgecolor = 'black', bins=variant)
-    axis[1, 2].plot(p2.pocket_list, p2.teor)
-    axis[1, 3].plot(p2.pocket_list, p2.f_y)
+    def draw_page(page):
+        match page:
+            case 0:
+                axis[0, 0].plot(p1.x, p1.y)
+                axis[0, 1].hist(p1.y, edgecolor = 'black', bins=p1.pocket_count)
+                axis[0, 2].hist(p1.y,  weights=np.ones_like (p1.y) / len (p1.y), edgecolor = 'black', bins=p1.pocket_count)
+                axis[0, 2].plot(p1.pocket_list, p1.nr)
+                axis[0, 3].plot(p1.pocket_list, p1.f_y)
+                axis[1, 0].plot(p1.x, p1.y)
+                axis[1, 1].hist(p2.y, edgecolor = 'black', bins=p1.pocket_count)
+                axis[1, 2].hist(p2.y,  weights=np.ones_like (p2.y) / len (p2.y), edgecolor = 'black', bins=variant)
+                axis[1, 2].plot(p2.pocket_list, p2.teor)
+                axis[1, 3].plot(p2.pocket_list, p2.f_y)
+                axis[0, 0].set_title('Title 1')
+            case 1:
+                axis[0, 0].plot(p3.x, p3.y)
+                axis[0, 1].hist(p3.y, edgecolor = 'black', bins=p3.pocket_count)
+                axis[0, 2].hist(p3.y, weights=np.ones_like (p3.y) / len (p3.y), edgecolor = 'black', bins=p3.pocket_count)
+                axis[0, 2].plot(p3.pocket_list, p3.teor)
+                axis[0, 3].plot(p3.pocket_list, p3.f_y)
+                axis[1, 0].plot(p4.x, p4.y)
+                axis[1, 1].hist(p4.y, edgecolor = 'black', bins=p4.pocket_count)
+                axis[1, 2].hist(p4.y, weights=np.ones_like (p4.y) / len (p4.y), edgecolor = 'black', bins=p4.pocket_count)
+                axis[1, 2].plot(p4.pocket_list, p4.teor)
+                axis[1, 3].plot(p4.pocket_list, p4.f_y)
+                
+            case 2:
+                axis[0, 0].plot(p5.x, p5.y)
+                axis[0, 1].hist(p5.y, edgecolor = 'black', bins=p5.pocket_count)
+                axis[0, 2].hist(p5.y, weights=np.ones_like (p5.y) / len (p5.y), edgecolor = 'black', bins=p5.pocket_count)
+                axis[0, 2].plot(p5.pocket_list, p5.teor)
+                axis[0, 3].plot(p5.pocket_list, p5.f_y)
     
+    freqs = 3
+    fig, axis = plt.subplots(2, 4)
+    fig.subplots_adjust(bottom=0.2)
+    draw_page(0)
     
+
+    class Index:
+        ind = 0
+
+        def next(self, event):
+            self.ind += 1
+            i = self.ind % freqs
+            for k in range (0, 2):
+                for j in range (0, 4):
+                    axis[k, j].clear()
+            draw_page(i)
+            plt.draw()
+
+        def prev(self, event):
+            self.ind -= 1
+            i = self.ind % freqs
+            for k in range (0, 2):
+                for j in range (0, 4):
+                    axis[k, j].clear()
+            draw_page(i)
+            plt.draw()
+
+    callback = Index()
+    axprev = fig.add_axes([0.7, 0.02, 0.1, 0.075])
+    axnext = fig.add_axes([0.81, 0.02, 0.1, 0.075])
+    bnext = Button(axnext, 'Next')
+    bnext.on_clicked(callback.next)
+    bprev = Button(axprev, 'Previous')
+    bprev.on_clicked(callback.prev)
 
     plt.tight_layout()
     plt.show()
