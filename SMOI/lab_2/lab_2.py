@@ -3,7 +3,7 @@ import numpy as np
 import copy
 
 #   Начальные значения
-variant = 7
+variant = 5
 np.random.seed(variant)
 item_size = 100
 
@@ -103,10 +103,6 @@ F2 = []
 for i in range (0, 3):
     F2.append(np.zeros(item_size+1, dtype=int))
 
-#for i in range (0, 3):
-#    if sost[1] == i+1:
-#        F2[i][1] = 1
-
 for i in range(0, 3):
     for j in range (1, item_size+1):
         if sost[j] == i+1:
@@ -137,9 +133,9 @@ axis[0, 2].plot(x, f[1], label="f2")
 axis[0, 2].plot(x, f[2], label="f3")
 axis[0, 2].plot(x, f[3], label="f4")
 
-axis[1, 0].plot(x, f[0], label="f1")
-axis[1, 0].plot(x, f[1], label="f2")
-axis[1, 0].plot(x, f[2], label="f3")
+axis[1, 0].plot(x, f2[0][1:], label="f1")
+axis[1, 0].plot(x, f2[1][1:], label="f2")
+axis[1, 0].plot(x, f2[2][1:], label="f3")
 axis[1, 1].plot(x, sost[1:])
 
 axis[0, 0].set_title("Равномерное распределение")
