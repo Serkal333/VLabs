@@ -5,7 +5,7 @@ import numpy as np
 import copy
 
 #   Начальные значения
-variant = 17
+variant = 10
 np.random.seed(variant)
 item_size = 100
 
@@ -130,13 +130,96 @@ if __name__ == "__main__":
     p5.otn_chast = copy.copy(p5.pocket_value)/item_size
     p5.teor = np.arange(float(p5.pocket_count+1))*0
     for i in range (0, p5.pocket_count):
-        p5.teor[i] = poisson.pmf(p5.pocket_list[i], sum(p5.y)/item_size) #!!!!!!!!!!ХЗ насколько это правильно
+        p5.teor[i] = poisson.pmf(p5.pocket_list[i], sum(p5.y)/item_size)
     p5.form_f_y()
 
     # Лист 6. сглаживание
 
+    item_size2 = 200
+    rand_num = np.random.rand(1, 10)
+    d1 = variant
+    d2 = variant * 2
+    d3 = variant * 3
+    d4 = 200 - variant
+    e1 = rand_num.max()
+    e2 = np.mean(rand_num)
+    e3 = rand_num.min()
+    p6 = Plot()
+    p6.x = list(range(1,201))
+
+    p6.y = np.random.rand(item_size2)
+    msa_d1 = np.zeros(item_size2-d1)
+    msa_d2 = np.zeros(item_size2-d2)
+    msa_d3 = np.zeros(item_size2-d3)
+    msa_d4 = np.zeros(item_size2-d4)
+    ecsp_e1 = np.zeros(item_size2-1)
+    ecsp_e2 = np.zeros(item_size2-1)
+    ecsp_e3 = np.zeros(item_size2-1)
+
+    for i in range (0, item_size2):
+        if i + 1 >= d1:
+            msa_d1[i-d1] = 0
+            for j in range (0, d1):
+                msa_d1[i-d1] += p6.y[i-j]
+            msa_d1[i-d1] /= d1
+        if i + 1 >= d2:
+            msa_d2[i-d2] = 0
+            for j in range (0, d2):
+                msa_d2[i-d2] += p6.y[i-j]
+            msa_d2[i-d2] /= d2
+        if i + 1 >= d3:
+            msa_d3[i-d3] = 0
+            for j in range (0, d3):
+                msa_d3[i-d3] += p6.y[i-j]
+            msa_d3[i-d3] /= d3
+        if i + 1 >= d4:
+            msa_d4[i-d4] = 0
+            for j in range (0, d4):
+                msa_d4[i-d4] += p6.y[i-j]
+            msa_d4[i-d4] /= d4
+        if i == 1:
+            ecsp_e1[i-1] = p6.y[i] * e1
+            ecsp_e2[i-1] = p6.y[i] * e2
+            ecsp_e3[i-1] = p6.y[i] * e3
+        if i > 1:
+            ecsp_e1[i-1] = p6.y[i] * e1 + (1 - e1) * ecsp_e1[i-2]
+            ecsp_e2[i-1] = p6.y[i] * e2 + (1 - e2) * ecsp_e2[i-2]
+            ecsp_e3[i-1] = p6.y[i] * e3 + (1 - e3) * ecsp_e3[i-2]
+
+    average = np.zeros(8)
+    dispers = np.zeros(8)
+    sko = np.zeros(8)
+
+    average[0] = np.mean(p6.y)
+    average[1] = np.mean(msa_d1)
+    average[2] = np.mean(msa_d2)
+    average[3] = np.mean(msa_d3)
+    average[4] = np.mean(msa_d4)
+    average[5] = np.mean(ecsp_e1)
+    average[6] = np.mean(ecsp_e2)
+    average[7] = np.mean(ecsp_e3)
+
+    square_deviation = lambda x : (x - np.mean(p6.y)) ** 2 
+    dispers[0] = sum( map(square_deviation, p6.y) ) / (item_size2 - 1)
+    square_deviation = lambda x : (x - np.mean(msa_d1)) ** 2 
+    dispers[1] = sum( map(square_deviation, msa_d1) ) / (item_size2 - 1)
+    square_deviation = lambda x : (x - np.mean(msa_d2)) ** 2 
+    dispers[2] = sum( map(square_deviation, msa_d2) ) / (item_size2 - 1)
+    square_deviation = lambda x : (x - np.mean(msa_d3)) ** 2 
+    dispers[3] = sum( map(square_deviation, msa_d3) ) / (item_size2 - 1)
+    square_deviation = lambda x : (x - np.mean(msa_d4)) ** 2 
+    dispers[4] = sum( map(square_deviation, msa_d4) ) / (item_size2 - 1)
+    square_deviation = lambda x : (x - np.mean(ecsp_e1)) ** 2 
+    dispers[5] = sum( map(square_deviation, ecsp_e1) ) / (item_size2 - 1)
+    square_deviation = lambda x : (x - np.mean(ecsp_e2)) ** 2 
+    dispers[6] = sum( map(square_deviation, ecsp_e2) ) / (item_size2 - 1)
+    square_deviation = lambda x : (x - np.mean(ecsp_e3)) ** 2 
+    dispers[7] = sum( map(square_deviation, ecsp_e3) ) / (item_size2 - 1)
+
+    for i in range (0,8):
+        sko[i] = dispers[i] ** (0.5)
     
-    print(p5.teor)
+    #print(p5.teor)
     
 
     #   Отрисовка
@@ -149,12 +232,21 @@ if __name__ == "__main__":
                 axis[0, 2].hist(p1.y,  weights=np.ones_like (p1.y) / len (p1.y), edgecolor = 'black', bins=p1.pocket_count)
                 axis[0, 2].plot(p1.pocket_list, p1.nr)
                 axis[0, 3].plot(p1.pocket_list, p1.f_y)
-                axis[1, 0].plot(p1.x, p1.y)
-                axis[1, 1].hist(p2.y, edgecolor = 'black', bins=p1.pocket_count)
-                axis[1, 2].hist(p2.y,  weights=np.ones_like (p2.y) / len (p2.y), edgecolor = 'black', bins=variant)
+                axis[1, 0].plot(p2.x, p2.y)
+                axis[1, 1].hist(p2.y, edgecolor = 'black', bins=p2.pocket_count)
+                axis[1, 2].hist(p2.y,  weights=np.ones_like (p2.y) / len (p2.y), edgecolor = 'black', bins=p2.pocket_count)
                 axis[1, 2].plot(p2.pocket_list, p2.teor)
                 axis[1, 3].plot(p2.pocket_list, p2.f_y)
-                axis[0, 0].set_title('Title 1')
+                
+                axis[0, 0].set_title('Нормальное распределение')
+                axis[0, 1].set_title('Гистограмма')
+                axis[0, 2].set_title('Гистограмма')
+                axis[0, 3].set_title('F(y)')
+                axis[1, 0].set_title('Равномерное распределение')
+                axis[1, 1].set_title('Гистограмма')
+                axis[1, 2].set_title('Гистограмма')
+                axis[1, 3].set_title('F(y)')
+
             case 1:
                 axis[0, 0].plot(p3.x, p3.y)
                 axis[0, 1].hist(p3.y, edgecolor = 'black', bins=p3.pocket_count)
@@ -166,6 +258,15 @@ if __name__ == "__main__":
                 axis[1, 2].hist(p4.y, weights=np.ones_like (p4.y) / len (p4.y), edgecolor = 'black', bins=p4.pocket_count)
                 axis[1, 2].plot(p4.pocket_list, p4.teor)
                 axis[1, 3].plot(p4.pocket_list, p4.f_y)
+
+                axis[0, 0].set_title('Бернулли')
+                axis[0, 1].set_title('Гистограмма')
+                axis[0, 2].set_title('Гистограмма')
+                axis[0, 3].set_title('F(y)')
+                axis[1, 0].set_title('Биноминальное')
+                axis[1, 1].set_title('Гистограмма')
+                axis[1, 2].set_title('Гистограмма')
+                axis[1, 3].set_title('F(y)')
                 
             case 2:
                 axis[0, 0].plot(p5.x, p5.y)
@@ -173,7 +274,40 @@ if __name__ == "__main__":
                 axis[0, 2].hist(p5.y, weights=np.ones_like (p5.y) / len (p5.y), edgecolor = 'black', bins=p5.pocket_count)
                 axis[0, 2].plot(p5.pocket_list, p5.teor)
                 axis[0, 3].plot(p5.pocket_list, p5.f_y)
-    
+
+                axis[1, 0].plot(p6.x, p6.y, label="Фактический")
+                axis[1, 0].plot(list(range(d1+1,201)), msa_d1, label="Сглаживание d1")
+                axis[1, 0].plot(list(range(d2+1,201)), msa_d2, label="Сглаживание d2")
+                axis[1, 0].plot(list(range(d3+1,201)), msa_d3, label="Сглаживание d3")
+                axis[1, 0].plot(list(range(d4+1,201)), msa_d4, label="Сглаживание d4")
+                
+                axis[1, 1].plot(p6.x, p6.y, label="Фактический")
+                axis[1, 1].plot(list(range(2,201)), ecsp_e1, label="Прогноз e1")
+                axis[1, 1].plot(list(range(2,201)), ecsp_e2, label="Прогноз e2")
+                axis[1, 1].plot(list(range(2,201)), ecsp_e3, label="Прогноз e3")
+
+                axis[1, 2].plot(1, average[0], ':o', label="Среднее СП")
+                axis[1, 2].plot(1, dispers[0], ':o', label="Дисп. СП")
+                axis[1, 2].plot(1, sko[0], ':o', label="СКО СП")
+                axis[1, 2].plot(list(range(2, 6)), np.array([average[i] for i in range (1, 5)]), label="Среднее МСС")
+                axis[1, 2].plot(list(range(2, 6)), np.array([dispers[i] for i in range (1, 5)]), label="Дисп. МСС")
+                axis[1, 2].plot(list(range(2, 6)), np.array([sko[i] for i in range (1, 5)]), label="СКО МСС")
+                axis[1, 2].plot(list(range(6, 9)), np.array([average[i] for i in range (5, 8)]), label="Среднее МЭС")
+                axis[1, 2].plot(list(range(6, 9)), np.array([dispers[i] for i in range (5, 8)]), label="Дисп. МЭС")
+                axis[1, 2].plot(list(range(6, 9)), np.array([sko[i] for i in range (5, 8)]), label="СКО МЭС")
+
+
+                axis[0, 0].set_title('Распределение Пуассона')
+                axis[0, 1].set_title('Гистограмма')
+                axis[0, 2].set_title('Гистограмма')
+                axis[0, 3].set_title('F(y)')
+                axis[1, 0].set_title('Метод скользящего среднего')
+                axis[1, 0].legend()
+                axis[1, 1].set_title('Экспоненциальное сглаживание')
+                axis[1, 1].legend()
+                axis[1, 2].set_title('Статистические характеристики сглаженных CП')
+                axis[1, 2].legend()
+                
     freqs = 3
     fig, axis = plt.subplots(2, 4)
     fig.subplots_adjust(bottom=0.2)
@@ -209,6 +343,6 @@ if __name__ == "__main__":
     bprev = Button(axprev, 'Previous')
     bprev.on_clicked(callback.prev)
 
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.show()
 
