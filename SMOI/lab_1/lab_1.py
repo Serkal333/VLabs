@@ -81,7 +81,6 @@ if __name__ == "__main__":
     #   Лист 3. Бернулли
 
     p3 = Plot()
-    p3.y = p3.y[:item_size]
     for i in range (0, item_size):
         p3.y = np.random.binomial(1, 0.17, item_size)
     p3.pocket_list = [0, 1]
@@ -101,7 +100,6 @@ if __name__ == "__main__":
 
     p4 = Plot()
     p4.m = 5
-    p4.y = p4.y[:item_size]
     for i in range (0, item_size):
         p4.y = np.random.binomial(p4.m, 0.17, item_size)
     p4.pocket = 1
@@ -136,7 +134,7 @@ if __name__ == "__main__":
     # Лист 6. сглаживание
 
     item_size2 = 200
-    rand_num = np.random.rand(1, 10)
+    rand_num = np.random.rand(10)
     d1 = variant
     d2 = variant * 2
     d3 = variant * 3
@@ -311,6 +309,8 @@ if __name__ == "__main__":
     freqs = 3
     fig, axis = plt.subplots(2, 4)
     fig.subplots_adjust(bottom=0.2)
+    fig.set_figheight(7)
+    fig.set_figwidth(14)
     draw_page(0)
     
 
