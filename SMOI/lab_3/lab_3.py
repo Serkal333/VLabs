@@ -29,9 +29,9 @@ shift1 = 3
 arrp_3 = np.zeros(item_size+shift1)
 
 
-arrp_3[0] = noise[0]*b*noise[0]
-arrp_3[1] = (noise[0]+noise[1])*b*noise[0]
-arrp_3[2] = (noise[0]+noise[1]+noise[2])*b*noise[0]
+arrp_3[0] = b*noise[0]
+arrp_3[1] = a*arrp_3[0] + b*noise[0]
+arrp_3[2] = a*arrp_3[0] + a*arrp_3[1] + b*noise[0]
 
 for i in range (0, item_size):
     arrp_3[i+shift1] = a*arrp_3[i+shift1-1] + a*arrp_3[i+shift1-2] + a*arrp_3[i+shift1-3] + b*noise[i]
@@ -44,11 +44,11 @@ for i in range (0, tau):
 shift2 = 5
 arrp_5 = np.zeros(item_size+shift2)
 
-arrp_5[0] = noise[0]*b*noise[0]
-arrp_5[1] = (noise[0]+noise[1])*b*noise[0]
-arrp_5[2] = (noise[0]+noise[1]+noise[2])*b*noise[0]
-arrp_5[3] = (noise[0]+noise[1]+noise[2]+noise[3])*b*noise[0]
-arrp_5[4] = (noise[0]+noise[1]+noise[2]+noise[3]+noise[4])*b*noise[0]
+arrp_5[0] = b*noise[0]
+arrp_5[1] = a*arrp_5[0] + b*noise[0]
+arrp_5[2] = a*arrp_5[0] + a*arrp_5[1] + b*noise[0]
+arrp_5[3] = a*arrp_5[0] + a*arrp_5[1] + a*arrp_5[2] + b*noise[0]
+arrp_5[4] = a*arrp_5[0] + a*arrp_5[1] + a*arrp_5[2] + a*arrp_5[3] + b*noise[0]
 
 for i in range (0, item_size):
     arrp_5[i+shift2] = a*arrp_5[i+shift2-1] + a*arrp_5[i+shift2-2] + a*arrp_5[i+shift2-3] + a*arrp_5[i+shift2-4] + a*arrp_5[i+shift2-5] + b*noise[i]
@@ -58,4 +58,38 @@ nacf_5 = np.zeros(tau)
 for i in range (0, tau):
     nacf_5[i] = np.corrcoef(arrp_5[shift2:shift2+item_size-tau], arrp_5[shift2+i:shift2+item_size-tau+i])[0,1]
 
-print(nacf_3)
+x = np.arange(-30, 31)
+ccf = np.zeros(2*tau+1)
+
+for i in range (0, tau+1):
+    ccf[i] = np.corrcoef(arrp_1[i:i+tau], arrp_3[tau:2*tau])[0,1]
+
+for i in range (tau+1, 2*tau+1):
+    ccf[i] = np.corrcoef(arrp_1[tau:2*tau], arrp_3[i:i+tau])[0,1]
+
+#   Отрисовка
+
+figure, axis = plt.subplots(2, 4)
+figure.set_figheight(7)
+figure.set_figwidth(14)
+
+axis[0, 0].plot(iter, arrp_1)
+axis[0, 1].plot(iter, arrp_3[shift1:])
+axis[0, 2].plot(iter, arrp_5[shift2:])
+axis[1, 0].plot(iter[:tau], nacf_1)
+axis[1, 1].plot(iter[:tau], nacf_3)
+axis[1, 2].plot(iter[:tau], nacf_5)
+axis[0, 3].plot(iter, noise)
+axis[1, 3].plot(x, ccf)
+
+axis[0, 0].set_title("АРСП_1")
+axis[0, 1].set_title("АРСП_3")
+axis[0, 2].set_title("АРСП_5")
+axis[0, 3].set_title("Шум")
+axis[1, 0].set_title("НАКФ_1")
+axis[1, 1].set_title("НАКФ_3")
+axis[1, 2].set_title("НАКФ_5")
+axis[1, 3].set_title("ВКФ_1_3")
+
+plt.show()
+print(ccf)
