@@ -67,6 +67,16 @@ for i in range (0, tau+1):
 for i in range (tau+1, 2*tau+1):
     ccf[i] = np.corrcoef(arrp_1[tau:2*tau], arrp_3[i:i+tau])[0,1]
 
+#   Линии тренда
+
+zt1 = np.polyfit (iter[:tau], nacf_1, 5)
+p1 = np.poly1d (zt1)
+zt2 = np.polyfit (iter[:tau], nacf_3, 5)
+p2 = np.poly1d (zt2)
+zt3 = np.polyfit (iter[:tau], nacf_5, 5)
+p3 = np.poly1d (zt3)
+
+print(zt1)
 #   Отрисовка
 
 figure, axis = plt.subplots(2, 4)
@@ -77,8 +87,11 @@ axis[0, 0].plot(iter, arrp_1)
 axis[0, 1].plot(iter, arrp_3)
 axis[0, 2].plot(iter, arrp_5)
 axis[1, 0].plot(iter[:tau], nacf_1)
+axis[1, 0].plot(iter[:tau], p1(iter[:tau]))
 axis[1, 1].plot(iter[:tau], nacf_3)
+axis[1, 1].plot(iter[:tau], p2(iter[:tau]))
 axis[1, 2].plot(iter[:tau], nacf_5)
+axis[1, 2].plot(iter[:tau], p3(iter[:tau]))
 axis[0, 3].plot(iter, noise)
 axis[1, 3].plot(x, ccf)
 
