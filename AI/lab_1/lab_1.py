@@ -13,12 +13,14 @@ epochs = int(np.random.uniform(7, 12))
 epoch_size = int(np.random.uniform(15, 25))
 item_size = int(epochs * epoch_size)
 
-#delta_C1 = 0.45 
-#teach_speed = 0.55
+delta_C1 = 0.45 
+teach_speed = 0.35
 
 class Train:
     def __init__(self):
+
         #   Начальные значения
+
         self.x1_c1 = np.random.uniform(0, 10)
         self.x2_c1 = np.random.uniform(5, 15)
         self.x3_c1 = np.random.uniform(0, 10)
@@ -33,6 +35,7 @@ class Train:
         self.sko_c2 = np.random.uniform(1, 3)
 
         #   Случайные числа
+        
         self.r1 = np.random.normal(0, 1, item_size)
         self.r2 = np.random.normal(0, 1, item_size)
         self.r3 = np.random.normal(0, 1, item_size)
@@ -174,6 +177,9 @@ class Train:
     #   Обучение для листа 4 (5 классов)
 
     def teach_list4(self):
+
+        #   Первая итерация
+
         w_first = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
         self.s_wx[0] = np.nanprod(np.dstack((
             np.array([self.learn_x0[0], self.learn_x1[0], self.learn_x2[0], self.learn_x3[0], self.learn_x4[0], self.learn_x5[0]]),
@@ -193,6 +199,8 @@ class Train:
         self.w3[0] = w_first[3] + self.dw3[0]
         self.w4[0] = w_first[4] + self.dw4[0]
         self.w5[0] = w_first[5] + self.dw5[0]
+
+        #   Все итерации
 
         for i in range(1, item_size):
             self.s_wx[i] = np.nanprod(np.dstack((
@@ -261,6 +269,8 @@ if __name__ == "__main__":
     t4 = copy.deepcopy(t1)
     t5 = copy.deepcopy(t1)
 
+    #   Обучение
+
     #   Лист 1
     t1.fill_learn_data()
     t1.specify_class()
@@ -290,6 +300,8 @@ if __name__ == "__main__":
     t5.teach()
     t5.results()
 
+    #   Отрисовка
+
     figure, axis = plt.subplots(2, 5)
     figure.set_figheight(7)
     figure.set_figwidth(14)
@@ -299,24 +311,18 @@ if __name__ == "__main__":
     axis[0, 0].plot([-5, 15], [t1.y1_graph, t1.y2_graph])
     axis[0, 0].set_xlim(-5, 20)
     axis[0, 0].set_ylim(set_dimensions(t1.y1_graph, t1.y2_graph))
-    axis[0, 0].set_title('x1 x2')
-    axis[0, 0].legend()
 
     axis[0, 1].scatter(t2.x1_class1, t2.x2_class1, s=5, label='С1')
     axis[0, 1].scatter(t2.x1_class2, t2.x2_class2, s=5, label='С2')
     axis[0, 1].plot([-5, 15], [t2.y1_graph, t2.y2_graph])
     axis[0, 1].set_xlim(-5, 20)
     axis[0, 1].set_ylim(set_dimensions(t2.y1_graph, t2.y2_graph))
-    axis[0, 1].set_title('x1 x2 с батчами')
-    axis[0, 1].legend()
-
+    
     axis[0, 2].scatter(t3.x1_class1, t3.x2_class1, s=5, label='C1')
     axis[0, 2].scatter(t3.x1_class2, t3.x2_class2, s=5, label='C2')
     axis[0, 2].plot([-5, 15], [t3.y1_graph, t3.y2_graph])
     axis[0, 2].set_xlim(-5, 20)
     axis[0, 2].set_ylim(set_dimensions(t3.y1_graph, t3.y2_graph))
-    axis[0, 2].set_title('x1 x2 с батчами без w0')
-    axis[0, 2].legend()
 
     axis[0, 3].plot(np.arange(epochs), t4.epochs_w0[:epochs], label='w0')
     axis[0, 3].plot(np.arange(epochs), t4.epochs_w1[:epochs], label='w1')
@@ -327,52 +333,59 @@ if __name__ == "__main__":
     axis[0, 3].set_xlim(0, epochs-1)
     axis[0, 3].set_ylim(np.amin([t4.epochs_w0, t4.epochs_w1, t4.epochs_w2, t4.epochs_w3, t4.epochs_w4, t4.epochs_w5])-1,
                         np.amax([t4.epochs_w0, t4.epochs_w1, t4.epochs_w2, t4.epochs_w3, t4.epochs_w4, t4.epochs_w5])+1)
-    axis[0, 3].set_title('x1 x2 x3 x4 x5')
-    axis[0, 3].legend()
 
     axis[0, 4].scatter(t5.x1_class1, t5.x2_class1, s=5, label='C1')
     axis[0, 4].scatter(t5.x1_class2, t5.x2_class2, s=5, label='C2')
     axis[0, 4].plot([-5, 15], [t5.y1_graph, t5.y2_graph])
     axis[0, 4].set_xlim(-5, 20)
     axis[0, 4].set_ylim(set_dimensions(t5.y1_graph, t5.y2_graph))
-    axis[0, 4].set_title('x1 = x2, c1 = c2')
-    axis[0, 4].legend()
 
     axis[1, 0].plot(np.arange(epochs), t1.epochs_err_count[:epochs], label='Ошибка')
     axis[1, 0].plot(np.arange(epochs), t1.epochs_w0[:epochs], label='w0')
     axis[1, 0].plot(np.arange(epochs), t1.epochs_w1[:epochs], label='w1')
     axis[1, 0].plot(np.arange(epochs), t1.epochs_w2[:epochs], label='w2')
     axis[1, 0].set_xlim(0, epochs-1)
-    axis[1, 0].set_title('Сходимость')
-    axis[1, 0].legend()
 
     axis[1, 1].plot(np.arange(epochs), t2.epochs_err_count[:epochs], label='Ошибка')
     axis[1, 1].plot(np.arange(epochs), t2.epochs_w0[:epochs], label='w0')
     axis[1, 1].plot(np.arange(epochs), t2.epochs_w1[:epochs], label='w1')
     axis[1, 1].plot(np.arange(epochs), t2.epochs_w2[:epochs], label='w2')
     axis[1, 1].set_xlim(0, epochs-1)
-    axis[1, 1].set_title('Сходимость')
-    axis[1, 1].legend()
 
     axis[1, 2].plot(np.arange(epochs), t3.epochs_err_count[:epochs], label='Ошибка')
     axis[1, 2].plot(np.arange(epochs), t3.epochs_w0[:epochs], label='w0')
     axis[1, 2].plot(np.arange(epochs), t3.epochs_w1[:epochs], label='w1')
     axis[1, 2].plot(np.arange(epochs), t3.epochs_w2[:epochs], label='w2')
     axis[1, 2].set_xlim(0, epochs-1)
-    axis[1, 2].set_title('Сходимость')
-    axis[1, 2].legend()
 
     axis[1, 3].plot(np.arange(epochs), t4.epochs_err_count[:epochs], label='Ошибка')
     axis[1, 3].set_xlim(0, epochs-1)
     axis[1, 3].set_ylim(0, np.amax(t4.epochs_err_count))
-    axis[1, 3].legend()
-    axis[1, 3].set_title('Сходимость')
-
+    
     axis[1, 4].plot(np.arange(epochs), t5.epochs_err_count[:epochs], label='Ошибка')
     axis[1, 4].plot(np.arange(epochs), t5.epochs_w0[:epochs], label='w0')
     axis[1, 4].plot(np.arange(epochs), t5.epochs_w1[:epochs], label='w1')
     axis[1, 4].plot(np.arange(epochs), t5.epochs_w2[:epochs], label='w2')
     axis[1, 4].set_xlim(0, epochs-1)
+
+    axis[0, 0].set_title('x1 x2')
+    axis[0, 0].legend()
+    axis[0, 1].set_title('x1 x2 с батчами')
+    axis[0, 1].legend()
+    axis[0, 2].set_title('x1 x2 с батчами без w0')
+    axis[0, 2].legend()
+    axis[0, 3].set_title('x1 x2 x3 x4 x5')
+    axis[0, 3].legend()
+    axis[0, 4].set_title('x1 = x2, c1 = c2')
+    axis[0, 4].legend()
+    axis[1, 0].set_title('Сходимость')
+    axis[1, 0].legend()
+    axis[1, 1].set_title('Сходимость')
+    axis[1, 1].legend()
+    axis[1, 2].set_title('Сходимость')
+    axis[1, 2].legend()
+    axis[1, 3].legend()
+    axis[1, 3].set_title('Сходимость')
     axis[1, 4].set_title('Сходимость')
     axis[1, 4].legend()
 
