@@ -76,7 +76,6 @@ p2 = np.poly1d (zt2)
 zt3 = np.polyfit (iter[:tau], nacf_5, 5)
 p3 = np.poly1d (zt3)
 
-print(zt1)
 #   Отрисовка
 
 figure, axis = plt.subplots(2, 4)
@@ -105,4 +104,3 @@ axis[1, 2].set_title("НАКФ_5")
 axis[1, 3].set_title("ВКФ_1_3")
 
 plt.show()
-print(a)
