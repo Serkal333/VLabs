@@ -22,7 +22,7 @@ class Plot:
         self.min_ind = np.zeros(self.steps)
         self.x1 = np.zeros(self.steps)
         self.x2 = np.zeros(self.steps)
-        self.r = 2  # np.random.uniform(1, 3)
+        self.r = 2
         self.R = np.random.uniform(0.2, 0.9)
         self.f = np.zeros(self.steps)
         self.f_350_plus = np.zeros(self.steps_f)
@@ -124,55 +124,55 @@ if __name__ == "__main__":
     figure, axis = plt.subplots(3, 3)
     figure.set_figheight(8)
     figure.set_figwidth(13)
-    t = []
-    t.append(Plot(20))
-    t.append(copy.deepcopy(t[0]))
-    t.append(copy.deepcopy(t[0]))
+    p = []
+    p.append(Plot(20))
+    p.append(copy.deepcopy(p[0]))
+    p.append(copy.deepcopy(p[0]))
 
     #   Решение каждого листа
-    t[1].prep_list_2()
-    t[2].prep_list_3()
-    t[0].solve()
-    t[1].solve()
-    t[2].solve()
+    p[1].prep_list_2()
+    p[2].prep_list_3()
+    p[0].solve()
+    p[1].solve()
+    p[2].solve()
 
     #   Отрисовка
     for i in range(0, 3):
         #   Движение по градиенту для каждого графика
-        t[i].results()
+        p[i].results()
         #   Сходимость F
-        axis[0, i].plot(np.arange(t[i].steps), t[i].f[: t[i].steps], label="F")
+        axis[0, i].plot(np.arange(p[i].steps), p[i].f[: p[i].steps], label="F")
         axis[0, i].legend()
         #   Сходимость
-        axis[1, i].scatter(np.arange(t[i].steps), t[i].x1[: t[i].steps], s=5)
-        axis[1, i].scatter(np.arange(t[i].steps), t[i].x2[: t[i].steps], s=5)
-        axis[1, i].plot(np.arange(t[i].steps), t[i].x1[: t[i].steps], label="x1")
-        axis[1, i].plot(np.arange(t[i].steps), t[i].x2[: t[i].steps], label="x2")
+        axis[1, i].scatter(np.arange(p[i].steps), p[i].x1[: p[i].steps], s=5)
+        axis[1, i].scatter(np.arange(p[i].steps), p[i].x2[: p[i].steps], s=5)
+        axis[1, i].plot(np.arange(p[i].steps), p[i].x1[: p[i].steps], label="x1")
+        axis[1, i].plot(np.arange(p[i].steps), p[i].x2[: p[i].steps], label="x2")
         axis[1, i].set_title("Сходимость по x1, x2")
         axis[1, i].legend()
         #   Начальные точки
         arr1 = []
         arr2 = []
         for j in range(0, 10):
-            arr1.append(t[i].x1_coord[j][0])
-            arr2.append(t[i].x2_coord[j][0])
+            arr1.append(p[i].x1_coord[j][0])
+            arr2.append(p[i].x2_coord[j][0])
         axis[2, i].scatter(arr1, arr2, s=15)
 
         #   Движение по градиенту
-        axis[2, i].scatter(np.arange(t[i].steps_f), t[i].f_350_plus, s=5)
-        axis[2, i].scatter(np.arange(t[i].steps_f), t[i].f_350_minus, s=5)
-        axis[2, i].scatter(np.arange(t[i].steps_f), t[i].f_200_plus, s=5)
-        axis[2, i].scatter(np.arange(t[i].steps_f), t[i].f_200_minus, s=5)
-        axis[2, i].scatter(np.arange(t[i].steps_f), t[i].f_50_plus, s=5)
-        axis[2, i].scatter(np.arange(t[i].steps_f), t[i].f_50_minus, s=5)
-        axis[2, i].plot(np.arange(t[i].steps_f), t[i].f_350_plus)
-        axis[2, i].plot(np.arange(t[i].steps_f), t[i].f_350_minus)
-        axis[2, i].plot(np.arange(t[i].steps_f), t[i].f_200_plus)
-        axis[2, i].plot(np.arange(t[i].steps_f), t[i].f_200_minus)
-        axis[2, i].plot(np.arange(t[i].steps_f), t[i].f_50_plus)
-        axis[2, i].plot(np.arange(t[i].steps_f), t[i].f_50_minus)
-        axis[2, i].plot(t[i].x1, t[i].x2, label="x")
-        axis[2, i].scatter(t[i].x1[t[i].steps - 1], t[i].x2[t[i].steps - 1], s=40)
+        axis[2, i].scatter(np.arange(p[i].steps_f), p[i].f_350_plus, s=5)
+        axis[2, i].scatter(np.arange(p[i].steps_f), p[i].f_350_minus, s=5)
+        axis[2, i].scatter(np.arange(p[i].steps_f), p[i].f_200_plus, s=5)
+        axis[2, i].scatter(np.arange(p[i].steps_f), p[i].f_200_minus, s=5)
+        axis[2, i].scatter(np.arange(p[i].steps_f), p[i].f_50_plus, s=5)
+        axis[2, i].scatter(np.arange(p[i].steps_f), p[i].f_50_minus, s=5)
+        axis[2, i].plot(np.arange(p[i].steps_f), p[i].f_350_plus)
+        axis[2, i].plot(np.arange(p[i].steps_f), p[i].f_350_minus)
+        axis[2, i].plot(np.arange(p[i].steps_f), p[i].f_200_plus)
+        axis[2, i].plot(np.arange(p[i].steps_f), p[i].f_200_minus)
+        axis[2, i].plot(np.arange(p[i].steps_f), p[i].f_50_plus)
+        axis[2, i].plot(np.arange(p[i].steps_f), p[i].f_50_minus)
+        axis[2, i].plot(p[i].x1, p[i].x2, label="x")
+        axis[2, i].scatter(p[i].x1[p[i].steps - 1], p[i].x2[p[i].steps - 1], s=40)
         axis[2, i].set_title("Движение по градиенту")
         axis[2, i].legend()
     axis[0, 0].set_title("Сход. ЦФ (уг. зондирования случайный)")
