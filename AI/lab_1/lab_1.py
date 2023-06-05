@@ -7,8 +7,8 @@ variant = 5
 np.random.seed(variant)
 
 # Параметры обучения
-#delta_C1 = np.random.uniform(0.2, 0.8)  
-#teach_speed = np.random.uniform(0.1, 0.9)
+delta_C1 = np.random.uniform(0.2, 0.8)  
+teach_speed = np.random.uniform(0.1, 0.9)
 epochs = int(np.random.uniform(7, 12))
 epoch_size = int(np.random.uniform(15, 25))
 item_size = int(epochs * epoch_size)
